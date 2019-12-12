@@ -2,6 +2,7 @@ package org.superbiz.moviefun.blobstore;
 
 import org.apache.tika.Tika;
 import org.apache.tika.io.IOUtils;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -9,7 +10,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Optional;
 
-
+@Component
 public class FileStore implements BlobStore {
 
     private final Tika tika = new Tika();

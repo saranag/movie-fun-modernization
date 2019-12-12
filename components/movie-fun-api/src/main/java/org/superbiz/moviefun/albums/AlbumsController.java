@@ -22,38 +22,29 @@ import java.util.Optional;
 import static java.lang.String.format;
 import static org.springframework.http.MediaType.IMAGE_JPEG_VALUE;
 
-@RestController
+@Controller
 @RequestMapping("/albums")
 public class AlbumsController {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-    private final AlbumsBean albumsBean;
+    private final AlbumsClient albumsBean;
     private final BlobStore blobStore;
 
-    public AlbumsController(AlbumsBean albumsBean, BlobStore blobStore) {
+    public AlbumsController(AlbumsClient albumsBean, BlobStore blobStore) {
         this.albumsBean = albumsBean;
         this.blobStore = blobStore;
     }
 
-    @PostMapping
-    public void addAlbum(@RequestBody Album album) {
-        logger.debug("Before calling add");
-        logger.debug(albumsBean.toString());
-        albumsBean.addAlbum(album);
-    }
-
     @GetMapping
-    public List<Album> index(Map<String, Object> model) {
-      //  model.put("albums", albumsBean.getAlbums());
-        List<Album> albums= albumsBean.getAlbums();
-        return albums;
+    public String index(Map<String, Object> model) {
+        model.put("albums", albumsBean.getAlbums());
+        return "albums";
     }
 
     @GetMapping("/{albumId}")
-    public Album details(@PathVariable long albumId, Map<String, Object> model) {
-       /* model.put("album", albumsBean.find(albumId));
-        return "albumDetails";*/
-       return albumsBean.find(albumId);
+    public String details(@PathVariable long albumId, Map<String, Object> model) {
+        model.put("album", albumsBean.find(albumId));
+        return "albumDetails";
     }
 
     @PostMapping("/{albumId}/cover")
@@ -89,9 +80,9 @@ public class AlbumsController {
 
     private void tryToUploadCover(@PathVariable Long albumId, @RequestParam("file") MultipartFile uploadedFile) throws IOException {
         Blob coverBlob = new Blob(
-            getCoverBlobName(albumId),
-            uploadedFile.getInputStream(),
-            uploadedFile.getContentType()
+                getCoverBlobName(albumId),
+                uploadedFile.getInputStream(),
+                uploadedFile.getContentType()
         );
 
         blobStore.put(coverBlob);
@@ -101,7 +92,7 @@ public class AlbumsController {
         ClassLoader classLoader = getClass().getClassLoader();
         InputStream input = classLoader.getResourceAsStream("default-cover.jpg");
 
-        return new Blob("default-cover", input, MediaType.IMAGE_JPEG_VALUE);
+        return new Blob("default-cover", input, IMAGE_JPEG_VALUE);
     }
 
     private String getCoverBlobName(@PathVariable long albumId) {

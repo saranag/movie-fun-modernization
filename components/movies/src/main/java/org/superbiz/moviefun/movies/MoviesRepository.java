@@ -29,12 +29,13 @@ import javax.persistence.metamodel.EntityType;
 import java.util.List;
 
 @Repository
-public class MoviesBean {
+public class MoviesRepository {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @PersistenceContext
     private EntityManager entityManager;
+
 
     public Movie find(Long id) {
         return entityManager.find(Movie.class, id);
